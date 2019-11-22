@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core"
+             ios:Page.UseSafeArea="true"
+             x:Class="XPA_GetContacts.MainPage">
+
+    <StackLayout>
+        <StackLayout Orientation="Horizontal"
+                     BackgroundColor="Indigo">
+            <Label x:Name="AppTitle"
+                   FontSize="Large"
+                   TextColor="White"
+                   FontAttributes="Bold"
+                   HorizontalOptions="StartAndExpand"/>
+            <Label x:Name="TodayIs"
+                   FontSize="Large"
+                   TextColor="White"
+                   HorizontalOptions="EndAndExpand" />
+        </StackLayout>
+
+        <Frame x:Name="frFilterOptions"
+               Margin="5,10"
+               BorderColor="Red"
+               BackgroundColor="Transparent">
+            <StackLayout>
+                <StackLayout Orientation="Horizontal">
+                    <Label Text="Show Phone Numbers"
+                           FontSize="Medium"
+                           VerticalOptions="Center"
+                           HorizontalOptions="StartAndExpand" />
+                    <Switch x:Name="swtShowPhoneNumber"
+                            IsToggled="True"
+                            HorizontalOptions="EndAndExpand" />
+                </StackLayout>
+                <StackLayout Orientation="Horizontal">
+                    <Label Text="Show E-Mails"
+                           FontSize="Medium"
+                           VerticalOptions="Center"
+                           HorizontalOptions="StartAndExpand" />
+                    <Switch x:Name="swtShowEMail"
+                            IsToggled="True"
+                            HorizontalOptions="EndAndExpand"/>
+                </StackLayout>
+            </StackLayout>
+        </Frame>
+
+        <SearchBar x:Name="sbSearchContacts"
+                   TextChanged="sbSearchContacts_TextChanged"
+                   Margin="5"
+                   BackgroundColor="#FBCBF3" />
+
+        <ListView x:Name="lvSearchedContacts"
+                  Margin="5"
+                  ItemSelected="lvSearchedContacts_ItemSelected"
+                  BackgroundColor="#D6F5FE">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <TextCell Text="{Binding Name}" />
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+        <StackLayout Orientation="Horizontal">
+            <ListView x:Name="lvNumbers"
+                      IsVisible="{Binding Source={x:Reference swtShowPhoneNumber}, Path=IsToggled}"
+                      Margin="5" />
+
+            <ListView x:Name="lvEmails"
+                      IsVisible="{Binding Source={x:Reference swtShowEMail}, Path=IsToggled}"
+                      Margin="5" />
+        </StackLayout>
+    </StackLayout>
+
+</ContentPage>
