@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Plugin.Permissions;
+using Plugin.Permissions.Abstractions;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -14,6 +16,7 @@ namespace XPA_GetContacts
     public partial class MainPage : ContentPage
     {
         IList<Plugin.ContactService.Shared.Contact> contacts;
+        bool CanReadContacts = false;
 
         public MainPage()
         {
@@ -25,13 +28,33 @@ namespace XPA_GetContacts
         {
             base.OnAppearing();
 
-            contacts = await Plugin.ContactService.CrossContactService.Current.GetContactListAsync();
-            lvSearchedContacts.ItemsSource = contacts;
+            if (Device.RuntimePlatform == Device.Android)
+            {
+                if (await CrossPermissions.Current.CheckPermissionStatusAsync(Permission.Contacts) == PermissionStatus.Granted)
+                {
+                    CanReadContacts = true;
+                }
+                else
+                {
+                    var results = await CrossPermissions.Current.RequestPermissionsAsync(Permission.Contacts);
+
+                    if (results[Permission.Contacts] == PermissionStatus.Granted)
+                        CanReadContacts = true;
+                }
+            }
+            else
+                CanReadContacts = true;
+
+            if (CanReadContacts)
+            {
+                contacts = await Plugin.ContactService.CrossContactService.Current.GetContactListAsync();
+                lvSearchedContacts.ItemsSource = contacts;
+            }
         }
 
         private void sbSearchContacts_TextChanged(object sender, TextChangedEventArgs e)
         {
-            lvSearchedContacts.ItemsSource = contacts.Where(x=>(x.Numbers.Count > 0 || x.Emails.Count > 0) && x.Name.Contains(sbSearchContacts.Text));
+            lvSearchedContacts.ItemsSource = contacts.Where(x=>(x.Numbers.Count > 0 || x.Emails.Count > 0) && x.Name.ToLower().Contains(sbSearchContacts.Text.ToLower()));
         }
 
         private void lvSearchedContacts_ItemSelected(object sender, SelectedItemChangedEventArgs e)
@@ -45,7 +68,10 @@ namespace XPA_GetContacts
             {
                 string[] n = strNumber.Split('=');
 
-                numbers.Add($"{(n[2].Contains("null") ? "" : n[2])}{n[1].Split(',')[0]}");
+                if (Device.RuntimePlatform == Device.iOS)
+                    numbers.Add($"{(n[2].Contains("null") ? "" : n[2])}{n[1].Split(',')[0]}");
+                else
+                    numbers.Add($"{n[0]}");
             }
 
             lvNumbers.ItemsSource = numbers;
